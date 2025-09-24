@@ -1,0 +1,44 @@
+name: BrownFoodApp
+description: A web application for sharing and discovering comfort food recipes.
+
+features:
+  authentication:
+    user_entity: User
+    jwt_secret: env(JWT_SECRET)
+  s3_storage:
+    bucket_name: env(S3_BUCKET_NAME)
+    region: env(S3_REGION)
+    access_key_id: env(S3_ACCESS_KEY_ID)
+    secret_access_key: env(S3_SECRET_ACCESS_KEY)
+
+entities:
+  User:
+    properties:
+      name: string(required=true)
+      email: string(unique=true, required=true)
+      password: password
+    access_policies:
+      - role: public
+        permissions: [create, read]
+      - role: authenticated
+        permissions: [read, update, delete]
+
+  Recipe:
+    properties:
+      title: string(required=true)
+      description: string(required=true)
+      prepTime: string # e.g., '20 mins'
+      cookTime: string # e.g., '1 hour'
+      servings: number
+      ingredients: array
+      instructions: string(required=true)
+      photoUrl: file
+    relationships:
+      - type: belongsTo
+        entity: User
+        foreignKey: authorId
+    access_policies:
+      - role: public
+        permissions: [read]
+      - role: authenticated
+        permissions: [create, read, update, delete]
